@@ -4,6 +4,8 @@ import express from "express";
 const app = express();
 const port = 8000;
 
+app.use(express.json());
+
 const users = {
     users_list: [
         {
@@ -30,7 +32,7 @@ const users = {
             id: "zap555",
             name: "Dennis",
             job: "Bartender"
-        }
+        },
     ]
 };
 
@@ -53,6 +55,17 @@ app.get("/users/:id", (req, res) => {
     }
 });
 
+const addUser = (user) => {
+    users["users_list"].push(user);
+    return user;
+};
+
+app.post("/users", (req, res) => {
+    const userToAdd = req.body;
+    addUser(userToAdd);
+    res.send();
+});
+
 app.get("/users", (req, res) => {
     const name = req.query.name;
     if (name != undefined) {
@@ -64,14 +77,14 @@ app.get("/users", (req, res) => {
     }
 });
 
-app.get("/users", (req, res) => {
-    res.send(users);
-});
 
-app.use(express.json());
 
 app.get("/", (req, res) => {
     res.send("Hello Danny!");
+});
+
+app.get("/users", (req, res) => {
+    res.send(users);
 });
 
 app.listen(port, () => {
