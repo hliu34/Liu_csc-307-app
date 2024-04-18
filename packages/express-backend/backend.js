@@ -53,16 +53,6 @@ const findUsersByNameAndJob = (name, job) => {
     );
 };
 
-app.get("/users/:id", (req, res) => {
-    const id = req.params["id"]; //or req.params.id
-    let result = findUserById(id);
-    if (result === undefined) {
-        res.status(404).send("Resource not found.");
-    } else {
-        res.send(result);
-    }
-});
-
 const addUser = (user) => {
     users["users_list"].push(user);
     return user;
@@ -77,10 +67,45 @@ const deleteUserById = (id) => {
     return false; // User not found
 };
 
+// Function to generate a random ID with 3 characters and 3 numbers
+function generateRandomId() {
+    const chars = 'abcdefghijklmnopqrstuvwxyz';
+    const nums = '0123456789';
+
+    let randomId = '';
+
+    // Generate 3 random characters
+    for (let i = 0; i < 3; i++) {
+        randomId += chars.charAt(Math.floor(Math.random() * chars.length));
+    }
+
+    // Generate 3 random numbers
+    for (let i = 0; i < 3; i++) {
+        randomId += nums.charAt(Math.floor(Math.random() * nums.length));
+    }
+
+    return randomId;
+}
+
+app.get("/users/:id", (req, res) => {
+    const id = req.params["id"]; //or req.params.id
+    let result = findUserById(id);
+    if (result === undefined) {
+        res.status(404).send("Resource not found.");
+    } else {
+        res.send(result);
+    }
+});
+
 app.post("/users", (req, res) => {
     const userToAdd = req.body;
+    // Generate a random ID for the user
+    const randomId = generateRandomId();
+
+    // Assign the generated ID to the user object
+    userToAdd.id = randomId;
     addUser(userToAdd);
-    res.status(201).send("User added successfully");
+    res.status(201).json(userToAdd);
 });
 
 // Existing route to get all users or filter by name
@@ -105,11 +130,12 @@ app.delete("/users/:id", (req, res) => {
     const id = req.params.id;
     const deleted = deleteUserById(id);
     if (deleted) {
-        res.send("User deleted successfully");
+        res.sendStatus(204); // Send 204 No Content status
     } else {
         res.status(404).send("User not found");
     }
 });
+
 
 app.get("/", (req, res) => {
     res.send("Hello Danny!");
