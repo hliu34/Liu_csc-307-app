@@ -1,13 +1,14 @@
 // backend.js
 import express from "express";
 import cors from "cors";
-import userService from "./services/user-service.js";
+import userService from "./user-service.js";
 
 const app = express();
 const port = 8000;
 
 app.use(express.json());
 app.use(cors());
+app.use(userService());
 
 const users = {
     users_list: [
@@ -38,27 +39,6 @@ const users = {
         },
     ]
 };
-
-/*const findUserByName = (name) => {
-    return users["users_list"].filter(
-        (user) => user["name"] === name
-    );
-};*/
-
-/*const findUserById = (id) =>
-    users["users_list"].find((user) => user["id"] === id);
-    */
-
-/*const findUsersByNameAndJob = (name, job) => {
-    return users["users_list"].filter(
-        (user) => user["name"] === name && user["job"] === job
-    );
-};*/
-
-/*const addUser = (user) => {
-    users["users_list"].push(user);
-    return user;
-};*/
 
 const deleteUserById = (id) => {
     const index = users["users_list"].findIndex((user) => user["id"] === id);
