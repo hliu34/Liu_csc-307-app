@@ -1,6 +1,7 @@
 // backend.js
 import express from "express";
 import cors from "cors";
+import userService from "./services/user-service.js";
 
 const app = express();
 const port = 8000;
@@ -38,25 +39,26 @@ const users = {
     ]
 };
 
-const findUserByName = (name) => {
+/*const findUserByName = (name) => {
     return users["users_list"].filter(
         (user) => user["name"] === name
     );
-};
+};*/
 
-const findUserById = (id) =>
+/*const findUserById = (id) =>
     users["users_list"].find((user) => user["id"] === id);
+    */
 
-const findUsersByNameAndJob = (name, job) => {
+/*const findUsersByNameAndJob = (name, job) => {
     return users["users_list"].filter(
         (user) => user["name"] === name && user["job"] === job
     );
-};
+};*/
 
-const addUser = (user) => {
+/*const addUser = (user) => {
     users["users_list"].push(user);
     return user;
-};
+};*/
 
 const deleteUserById = (id) => {
     const index = users["users_list"].findIndex((user) => user["id"] === id);
@@ -87,14 +89,20 @@ function generateRandomId() {
     return randomId;
 }
 
-app.get("/users/:id", (req, res) => {
+app.get("/users/:id", async (req, res) => {
     const id = req.params["id"]; //or req.params.id
-    let result = findUserById(id);
-    if (result === undefined) {
-        res.status(404).send("Resource not found.");
-    } else {
-        res.send(result);
-    }
+
+    userService.findUserById()
+        .then((result) => {
+            if (result) {
+                res.send(result);
+            } else {
+                res.status(404).send(`Not Found: ${id}`);
+            }
+        })
+        .catch((error) => {
+            res.status(500).send(error.name);
+        });
 });
 
 app.post("/users", (req, res) => {
@@ -104,8 +112,11 @@ app.post("/users", (req, res) => {
 
     // Assign the generated ID to the user object
     userToAdd.id = randomId;
-    addUser(userToAdd);
-    res.status(201).json(userToAdd);
+
+    userService
+        .addUser(userToAdd)
+        .then((result) => res.status(201).send(result));
+    //res.status(201).json(userToAdd);
 });
 
 // Existing route to get all users or filter by name
@@ -115,7 +126,7 @@ app.get("/users", (req, res) => {
     if (name != undefined) {
         let result;
         if (job != undefined) {
-            result = findUsersByNameAndJob(name, job);
+            result = getUsers(name, job); // modified from findUserAndJob
         } else {
             result = findUserByName(name);
         }
@@ -150,6 +161,4 @@ app.listen(port, () => {
         `Example app listening at http://localhost:${port}`
     );
 });
-
-
 
