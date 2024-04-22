@@ -1,14 +1,14 @@
 // backend.js
 import express from "express";
 import cors from "cors";
-import userService from "./user-service.js";
+import userService from "./user-services.js";
 
 const app = express();
 const port = 8000;
 
+app.use(userService);
 app.use(express.json());
 app.use(cors());
-app.use(userService());
 
 const users = {
     users_list: [
