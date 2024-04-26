@@ -27,7 +27,8 @@ function MyApp() {
     }
 
     function removeOneCharacter(index) {
-        const character_id = characters[index].id; // Get the id using the index
+        const character_id = characters[index]._id; // Get the id using the index
+        console.log(character_id);
         deleteUser(character_id)
             .then(() => {
                 const updated = characters.filter((character, i) => i !== index); // Filter out the user with the given index
